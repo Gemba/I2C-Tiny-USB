@@ -617,7 +617,6 @@ static inline void initSerialNumber();
 /* --------------------------------- main ---------------------------------- */
 /* ------------------------------------------------------------------------- */
 int main(void) {
-  uchar i;
   uchar calibrationValue;
 
   clock_prescale_set(clock_div_1);
@@ -629,31 +628,38 @@ int main(void) {
 
   initSerialNumber();
 
-  i2c_init();
-
-  // i2c_scan();
-
   usbDeviceDisconnect();
-  for (i = 0; i < 20; i++) { /* 300 ms disconnect */
-    _delay_ms(15);
+  for (int i = 0; i < 120; i++) {
+    /* ~12 sec wait after cold boot of Rpi, Adjust to needs.
+       digispark programmable when PB5 to GND,
+       ie., no timeout of micronucleus to take into account */
+    _delay_ms(100);
   }
-  usbDeviceConnect();
 
   wdt_enable(WDTO_1S);
 
+  i2c_init();
+
+  /* clear usb ports */
+  USB_CFG_IOPORT &=
+      (uchar) ~((1 << USB_CFG_DMINUS_BIT) | (1 << USB_CFG_DPLUS_BIT));
+
+  /* make usb data lines outputs */
+  USBDDR |= ((1 << USB_CFG_DMINUS_BIT) | (1 << USB_CFG_DPLUS_BIT));
+
+  /* USB Reset by device only required on Watchdog Reset */
+  _delay_loop_2(40000); // 10ms
+
+  /* make usb data lines inputs */
+  USBDDR &= ~((1 << USB_CFG_DMINUS_BIT) | (1 << USB_CFG_DPLUS_BIT));
+
   usbInit();
+
   sei();
-
-  pinMode(B, 1, OUTPUT);
-
-  pinMode(B, 5, INPUT);
-  internalPullup(B, 5, DISABLE);
-
-  for (;;) {
+  for (;;) { /* main event loop */
     wdt_reset();
     usbPoll();
   }
-
   return 0;
 }
 
