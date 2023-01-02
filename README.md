@@ -1,3 +1,9 @@
+
+**Note**: This fork is a slightly modified implementation, focusing on DigiSpark usage. Generic firmware is as upstream. Also run `git submodule update --init --recursive` once after checkout.
+
+
+**Original README.md**:
+
 # i2c-tiny-usb
 
 ## Update 2022-01-10

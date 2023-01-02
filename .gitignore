@@ -1,0 +1,7 @@
+firmware/usbdrv/*.o
+digispark/usbdrv/oddebug.o digispark/usbdrv/usbdrvasm.o digispark/usbdrv/usbdrv.o
+firmware/main.o
+digispark/main.elf
+firmware/firmware.hex
+digispark/firmware.hex
+digispark/main.hex
